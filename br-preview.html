@@ -243,63 +243,79 @@
             });
     
             function render(mainImg) {
-                canvas.width = mainImg.width;
-                canvas.height = mainImg.height;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.drawImage(mainImg, 0, 0);
+    canvas.width = mainImg.width;
+    canvas.height = mainImg.height;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-                const targetW = 722;
-                const targetH = 82;
-                const margin = 50; 
-                const pos = positionSelect.value;
-                
-                let x, y;
+    // 先畫底圖
+    ctx.drawImage(mainImg, 0, 0);
+
+    // --- 比例核心邏輯開始 ---
+    const wmRatio = 0.25; // 浮水印佔原圖寬度的 25% (可隨意調整)
+    const marginRatio = 0.03; // 邊距佔原圖寬度的 3%
+
+    // 1. 計算動態寬度
+    const targetW = canvas.width * wmRatio;
     
-                switch(pos) {
-                    case 'tl': // Top Left
-                        x = margin;
-                        y = margin;
-                        break;
-                    case 'tr': // Top Right
-                        x = canvas.width - targetW - margin;
-                        y = margin;
-                        break;
-                    case 'bl': // Bottom Left
-                        x = margin;
-                        y = canvas.height - targetH - margin;
-                        break;
-                    case 'br': // Bottom Right
-                    default:
-                        x = canvas.width - targetW - margin;
-                        y = canvas.height - targetH - margin;
-                        break;
-                }
+    // 2. 根據浮水印原始長寬比計算高度，防止變形
+    // 假設 wmImg 是你的浮水印圖片對象
+    const wmAspectRatio = wmImg.height / wmImg.width;
+    const targetH = targetW * wmAspectRatio;
+
+    // 3. 計算動態邊距
+    const dynamicMargin = canvas.width * marginRatio;
+    // --- 比例核心邏輯結束 ---
+
+    const pos = positionSelect.value;
+    let x, y;
+
+    switch(pos) {
+        case 'tl':
+            x = dynamicMargin;
+            y = dynamicMargin;
+            break;
+        case 'tr':
+            x = canvas.width - targetW - dynamicMargin;
+            y = dynamicMargin;
+            break;
+        case 'bl':
+            x = dynamicMargin;
+            y = canvas.height - targetH - dynamicMargin;
+            break;
+        case 'br':
+        default:
+            x = canvas.width - targetW - dynamicMargin;
+            y = canvas.height - targetH - dynamicMargin;
+            break;
+    }
+
+    // 處理浮水印顏色 (保持你原本的離屏畫布邏輯)
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = wmImg.width;
+    offCanvas.height = wmImg.height;
+    const offCtx = offCanvas.getContext('2d');
+    offCtx.drawImage(wmImg, 0, 0);
+    offCtx.globalCompositeOperation = 'source-in';
+    offCtx.fillStyle = 'white';
+    offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+
+    ctx.save();
+    ctx.globalAlpha = 0.4; 
+    // 使用我們算出來的比例尺寸 targetW, targetH
+    ctx.drawImage(offCanvas, x, y, targetW, targetH);
+    ctx.restore();
+
+    canvas.style.display = 'block';
+    dlBtn.style.display = 'inline-block';
     
-                const offCanvas = document.createElement('canvas');
-                offCanvas.width = wmImg.width;
-                offCanvas.height = wmImg.height;
-                const offCtx = offCanvas.getContext('2d');
-                offCtx.drawImage(wmImg, 0, 0);
-                offCtx.globalCompositeOperation = 'source-in';
-                offCtx.fillStyle = 'white';
-                offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height);
-    
-                ctx.save();
-                ctx.globalAlpha = 0.4; 
-                ctx.drawImage(offCanvas, x, y, targetW, targetH);
-                ctx.restore();
-    
-                canvas.style.display = 'block';
-                dlBtn.style.display = 'inline-block';
-                
-                dlBtn.onclick = () => {
-                    const link = document.createElement('a');
-                    link.download = `watermarked_${new Date().getTime()}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                };
-            }
+    dlBtn.onclick = () => {
+        const link = document.createElement('a');
+        link.download = `watermarked_${new Date().getTime()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+}
+
         </script>
     </div>
 </body>
