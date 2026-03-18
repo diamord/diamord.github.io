@@ -3,256 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>錯題複習系統</title>
+    <title>錯題複習</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap');
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Noto Serif TC', serif;
-            background: #fafaf8;
-            color: #2c2c2c;
-            line-height: 1.8;
-            padding: 20px 20px 80px;
-        }
-        
+        body { font-family: 'Noto Serif TC', serif; background: #fafaf8; color: #2c2c2c; line-height: 1.8; padding: 20px 20px 80px; }
         .container { max-width: 700px; margin: 0 auto; }
-        h2 { text-align: center; margin-bottom: 30px; color: #1a1a1a; font-weight: 700; }
-        
-        /* 表單 */
+        h2 { text-align: center; margin-bottom: 30px; font-weight: 700; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: #666; font-size: 0.95em; }
-        select, input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 1em;
-            background: white;
-        }
+        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 1em; background: white; }
         textarea { min-height: 100px; resize: vertical; }
         select:focus, input:focus, textarea:focus { outline: none; border-color: #666; }
-        
-        /* 檔案上傳 */
         .file-wrapper { position: relative; }
         .file-wrapper input[type="file"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .file-btn {
-            padding: 12px;
-            border: 2px dashed #ccc;
-            border-radius: 6px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+        .file-btn { padding: 12px; border: 2px dashed #ccc; border-radius: 6px; text-align: center; cursor: pointer; }
         .file-btn:hover { border-color: #666; background: #f5f5f5; }
-        #preview-img { max-width: 100%; margin-top: 10px; border-radius: 6px; display: none; }
-        
-        /* 按鈕 */
-        button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        #preview { max-width: 100%; margin-top: 10px; border-radius: 6px; display: none; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 6px; font-family: inherit; font-size: 1em; font-weight: 600; cursor: pointer; }
         .btn-primary { background: #2c2c2c; color: white; margin-top: 10px; }
         .btn-primary:hover { background: #1a1a1a; }
-        .btn-secondary { background: white; border: 1px solid #ddd; color: #2c2c2c; }
+        .btn-secondary { background: white; border: 1px solid #ddd; color: #2c2c2c; margin-top: 10px; }
         .btn-secondary:hover { background: #f5f5f5; }
-        
-        /* 科目篩選 */
-        .filter { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            margin-bottom: 20px;
-            border: 1px solid #e5e5e5;
-        }
+        .filter { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e5e5e5; }
         .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .chip {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95em;
-        }
+        .chip { padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 0.95em; }
         .chip:hover { background: #f5f5f5; }
         .chip.active { background: #2c2c2c; color: white; border-color: #2c2c2c; }
-        
-        /* 卡片 */
-        .card {
-            background: white;
-            padding: 24px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #e5e5e5;
-        }
-        .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 16px; 
-            font-size: 0.9em; 
-            color: #999;
-        }
-        .subject-tag { 
-            background: #f0f0f0; 
-            padding: 4px 12px; 
-            border-radius: 4px; 
-            color: #666;
-            font-weight: 600;
-        }
+        .card { background: white; padding: 24px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e5e5e5; }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 0.9em; color: #999; }
+        .subject-tag { background: #f0f0f0; padding: 4px 12px; border-radius: 4px; color: #666; font-weight: 600; }
         .card img { max-width: 100%; border-radius: 6px; margin-bottom: 16px; }
         .answer-hidden { display: none; margin-top: 16px; padding: 16px; background: #f9f9f9; border-radius: 6px; }
-        
-        /* 考試模式 */
-        .exam-box { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 8px;
-            border: 1px solid #e5e5e5;
-        }
-        .exam-header { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 24px; 
-            padding-bottom: 16px; 
-            border-bottom: 1px solid #e5e5e5;
-        }
+        .exam-box { background: white; padding: 30px; border-radius: 8px; border: 1px solid #e5e5e5; }
+        .exam-header { display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e5e5; }
         .question-img { width: 100%; border-radius: 6px; margin-bottom: 20px; }
         .question-text { font-size: 1.1em; margin-bottom: 24px; white-space: pre-wrap; }
-        
-        /* 選項 */
         .options { margin-bottom: 20px; }
-        .option {
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            border: 2px solid #e5e5e5;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: flex-start;
-        }
+        .option { padding: 14px 16px; margin-bottom: 10px; border: 2px solid #e5e5e5; border-radius: 6px; cursor: pointer; display: flex; align-items: flex-start; }
         .option:hover { border-color: #666; background: #fafafa; }
         .option.selected { border-color: #2c2c2c; background: #f5f5f5; }
         .option.correct { border-color: #4caf50; background: #e8f5e9; }
         .option.wrong { border-color: #f44336; background: #ffebee; }
-        .option-label { 
-            font-weight: 700; 
-            margin-right: 12px; 
-            min-width: 24px;
-            color: #666;
-        }
-        .option.selected .option-label { color: #2c2c2c; }
-        
-        /* 輸入答案模式 */
-        .answer-input {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1em;
-            text-align: center;
-            font-weight: 600;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        
-        /* 結果彈窗 */
-        .result-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .result-box {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
+        .option-label { font-weight: 700; margin-right: 12px; min-width: 24px; color: #666; }
+        .result-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .result-box { background: white; padding: 40px; border-radius: 12px; max-width: 400px; width: 90%; text-align: center; }
         .result-score { font-size: 3em; font-weight: 700; margin: 20px 0; }
         .result-stats { display: flex; justify-content: space-around; margin: 30px 0; }
-        .result-stat { text-align: center; }
         .stat-value { font-size: 2em; font-weight: 700; margin-bottom: 5px; }
         .stat-label { color: #999; font-size: 0.9em; }
-        
-        /* 導航欄 */
-        .nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid #e5e5e5;
-            display: flex;
-        }
-        .nav-item {
-            flex: 1;
-            padding: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #999;
-            font-weight: 600;
-        }
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e5e5; display: flex; }
+        .nav-item { flex: 1; padding: 16px; text-align: center; cursor: pointer; color: #999; font-weight: 600; }
         .nav-item.active { color: #2c2c2c; background: #fafafa; }
-        
         .view { display: none; }
         .view.active { display: block; }
         .hidden { display: none !important; }
         .empty { text-align: center; padding: 60px 20px; color: #999; }
-        
-        /* 提示 */
-        .hint {
-            font-size: 0.85em;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        /* 設定選項 */
-        .settings {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        .settings label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        .settings input[type="checkbox"] {
-            width: auto;
-            cursor: pointer;
-        }
+        .loading { text-align: center; padding: 20px; color: #999; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 新增頁面 -->
-    <div id="add-view" class="view active">
+    <div id="add" class="view active">
         <h2>新增錯題</h2>
         <div class="form-group">
             <label>科目</label>
-            <select id="subject">
+            <select id="subj">
                 <option value="國文">國文</option>
                 <option value="英文">英文</option>
                 <option value="數學">數學</option>
@@ -261,552 +78,336 @@
             </select>
         </div>
         <div class="form-group">
-            <label>題目圖片（選填）</label>
+            <label>題目圖片</label>
             <div class="file-wrapper">
-                <div class="file-btn">點擊選擇圖片</div>
-                <input type="file" id="image" accept="image/*">
+                <div class="file-btn">選擇圖片</div>
+                <input type="file" id="img" accept="image/*">
             </div>
-            <img id="preview-img">
+            <img id="preview">
         </div>
         <div class="form-group">
-            <label>題目內容或解題重點</label>
-            <textarea id="point" placeholder="輸入題目內容或重點筆記...&#10;國文題目可直接輸入注音"></textarea>
+            <label>題目內容</label>
+            <textarea id="point" placeholder="題目或重點筆記"></textarea>
         </div>
         <div class="form-group">
             <label>正確答案</label>
-            <input type="text" id="answer" placeholder="例如：B 或 3:5">
+            <input id="ans" placeholder="正確答案">
         </div>
-        
-        <div class="settings">
-            <label>
-                <input type="checkbox" id="auto-generate" checked>
-                自動生成干擾選項（背景預先生成，考試時更快）
-            </label>
-        </div>
-        
         <button class="btn-primary" onclick="save()">儲存</button>
     </div>
 
-    <!-- 複習頁面 -->
-    <div id="review-view" class="view">
-        <h2>複習模式</h2>
+    <div id="review" class="view">
+        <h2>複習</h2>
         <div class="filter">
-            <label>選擇科目</label>
+            <label>科目</label>
             <div class="chips">
-                <div class="chip active" onclick="filterSubject(this, 'all')">全部</div>
-                <div class="chip" onclick="filterSubject(this, '國文')">國文</div>
-                <div class="chip" onclick="filterSubject(this, '英文')">英文</div>
-                <div class="chip" onclick="filterSubject(this, '數學')">數學</div>
-                <div class="chip" onclick="filterSubject(this, '自然')">自然</div>
-                <div class="chip" onclick="filterSubject(this, '社會')">社會</div>
+                <div class="chip active" onclick="filter(this,'all')">全部</div>
+                <div class="chip" onclick="filter(this,'國文')">國文</div>
+                <div class="chip" onclick="filter(this,'英文')">英文</div>
+                <div class="chip" onclick="filter(this,'數學')">數學</div>
+                <div class="chip" onclick="filter(this,'自然')">自然</div>
+                <div class="chip" onclick="filter(this,'社會')">社會</div>
             </div>
         </div>
         <div id="cards"></div>
     </div>
 
-    <!-- 考試頁面 -->
-    <div id="exam-view" class="view">
-        <div id="exam-start">
-            <h2>考試模式</h2>
+    <div id="exam" class="view">
+        <div id="start">
+            <h2>考試</h2>
             <div class="filter">
-                <label>選擇科目</label>
+                <label>科目</label>
                 <div class="chips">
-                    <div class="chip active" onclick="filterExam(this, 'all')">全部</div>
-                    <div class="chip" onclick="filterExam(this, '國文')">國文</div>
-                    <div class="chip" onclick="filterExam(this, '英文')">英文</div>
-                    <div class="chip" onclick="filterExam(this, '數學')">數學</div>
-                    <div class="chip" onclick="filterExam(this, '自然')">自然</div>
-                    <div class="chip" onclick="filterExam(this, '社會')">社會</div>
+                    <div class="chip active" onclick="filterE(this,'all')">全部</div>
+                    <div class="chip" onclick="filterE(this,'國文')">國文</div>
+                    <div class="chip" onclick="filterE(this,'英文')">英文</div>
+                    <div class="chip" onclick="filterE(this,'數學')">數學</div>
+                    <div class="chip" onclick="filterE(this,'自然')">自然</div>
+                    <div class="chip" onclick="filterE(this,'社會')">社會</div>
                 </div>
             </div>
-            <div id="exam-count" style="text-align:center; margin:20px 0; color:#999;"></div>
-            <button class="btn-primary" onclick="startExam()">開始測驗</button>
+            <div id="count" style="text-align:center; margin:20px 0; color:#999;"></div>
+            <button class="btn-primary" onclick="startExam()">開始</button>
         </div>
         
-        <div id="exam-progress" class="hidden">
+        <div id="prog" class="hidden">
             <div class="exam-box">
                 <div class="exam-header">
-                    <span><strong id="curr">1</strong> / <span id="total">0</span></span>
-                    <span>✓ <strong id="correct">0</strong> ✗ <strong id="wrong">0</strong></span>
+                    <span><b id="cur">1</b>/<span id="tot">0</span></span>
+                    <span>✓<b id="cor">0</b> ✗<b id="wrg">0</b></span>
                 </div>
-                <img id="q-img" class="question-img hidden">
-                <div id="q-text" class="question-text"></div>
-                <div id="answer-area"></div>
-                <button class="btn-primary" onclick="submit()">送出答案</button>
-                <button class="btn-secondary" onclick="skip()" style="margin-top:10px;">跳過</button>
+                <img id="qimg" class="question-img hidden">
+                <div id="qtxt" class="question-text"></div>
+                <div id="opts" class="options"></div>
+                <button class="btn-primary" onclick="submit()">送出</button>
+                <button class="btn-secondary" onclick="skip()">跳過</button>
             </div>
         </div>
     </div>
 </div>
 
 <div class="nav">
-    <div class="nav-item active" onclick="switchView('add-view', this)">新增</div>
-    <div class="nav-item" onclick="switchView('review-view', this)">複習</div>
-    <div class="nav-item" onclick="switchView('exam-view', this)">考試</div>
+    <div class="nav-item active" onclick="switchView('add',this)">新增</div>
+    <div class="nav-item" onclick="switchView('review',this)">複習</div>
+    <div class="nav-item" onclick="switchView('exam',this)">考試</div>
 </div>
 
 <script>
-let img = null, reviewSubject = 'all', examSubject = 'all';
-let questions = [], curr = 0, correct = 0, wrong = 0, selected = null;
+let imgData=null, rSubj='all', eSubj='all', qs=[], cur=0, cor=0, wrg=0, sel=null;
 
-// 選項生成規則庫
-const optionRules = {
-    國文: {
-        templates: [
-            // 注音相關
-            { pattern: /[ㄅ-ㄦ]+/, generate: (ans) => generateBopomofo(ans) },
-            // 字音字形
-            { pattern: /音|讀/, generate: (ans) => generateSimilarChars(ans) },
-            // 成語
-            { pattern: /成語|四字/, generate: (ans) => generateIdioms(ans) },
-        ],
-        default: (ans) => [ans, ans + '（誤）', '以上皆非', '無法判斷']
-    },
-    英文: {
-        templates: [
-            // 單字
-            { pattern: /[A-Za-z]{4,}/, generate: (ans) => generateSimilarWords(ans) },
-            // 時態
-            { pattern: /ed|ing|will/, generate: (ans) => generateTenses(ans) },
-        ],
-        default: (ans) => [ans, ans.toUpperCase(), ans.toLowerCase(), 'None']
-    },
-    數學: {
-        templates: [
-            // 數字答案
-            { pattern: /^\d+$/, generate: (ans) => generateNumbers(ans) },
-            // 分數
-            { pattern: /\/|:/, generate: (ans) => generateFractions(ans) },
-        ],
-        default: (ans) => [ans, '0', '1', '無解']
-    },
-    自然: {
-        default: (ans) => [ans, ans + '離子', '以上皆是', '以上皆非']
-    },
-    社會: {
-        default: (ans) => [ans, ans + '時期', '明朝', '清朝']
-    }
-};
-
-// 生成相似注音
-function generateBopomofo(ans) {
-    const bopomofo = 'ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ';
-    const options = [ans];
-    for (let i = 0; i < 3; i++) {
-        let fake = ans;
-        const pos = Math.floor(Math.random() * ans.length);
-        const char = ans[pos];
-        if (bopomofo.includes(char)) {
-            const idx = bopomofo.indexOf(char);
-            const newChar = bopomofo[(idx + Math.floor(Math.random() * 10) + 1) % bopomofo.length];
-            fake = ans.substring(0, pos) + newChar + ans.substring(pos + 1);
-        }
-        options.push(fake);
-    }
-    return options;
-}
-
-// 生成相似字
-function generateSimilarChars(ans) {
-    const similar = {
-        '在': ['再', '存', '才'],
-        '的': ['得', '地', '底'],
-        '測': ['側', '則', '惻'],
-        '辨': ['辯', '辦', '瓣']
-    };
-    const options = [ans];
-    const chars = ans.split('');
-    for (let i = 0; i < 3; i++) {
-        let fake = ans;
-        for (let char of chars) {
-            if (similar[char]) {
-                const s = similar[char];
-                fake = ans.replace(char, s[Math.floor(Math.random() * s.length)]);
-                break;
-            }
-        }
-        options.push(fake !== ans ? fake : ans + '字');
-    }
-    return options;
-}
-
-// 生成相似成語
-function generateIdioms(ans) {
-    const idioms = ['守株待兔', '刻舟求劍', '掩耳盜鈴', '畫蛇添足', '亡羊補牢', '杯弓蛇影'];
-    const options = [ans];
-    while (options.length < 4) {
-        const random = idioms[Math.floor(Math.random() * idioms.length)];
-        if (!options.includes(random)) options.push(random);
-    }
-    return options;
-}
-
-// 生成相似英文字
-function generateSimilarWords(ans) {
-    const prefixes = ['un', 're', 'pre', 'dis'];
-    const suffixes = ['ed', 'ing', 'ly', 'tion'];
-    const options = [ans];
-    options.push(prefixes[Math.floor(Math.random() * prefixes.length)] + ans);
-    options.push(ans + suffixes[Math.floor(Math.random() * suffixes.length)]);
-    options.push(ans.charAt(0).toUpperCase() + ans.slice(1));
-    return options;
-}
-
-// 生成時態變化
-function generateTenses(ans) {
-    const options = [ans];
-    if (ans.endsWith('ed')) {
-        options.push(ans.slice(0, -2));
-        options.push(ans.slice(0, -2) + 'ing');
-        options.push('will ' + ans.slice(0, -2));
-    } else {
-        options.push(ans + 'ed');
-        options.push(ans + 'ing');
-        options.push('will ' + ans);
-    }
-    return options;
-}
-
-// 生成數字干擾選項
-function generateNumbers(ans) {
-    const num = parseInt(ans);
-    return [ans, String(num + 1), String(num - 1), String(num * 2)];
-}
-
-// 生成分數干擾選項
-function generateFractions(ans) {
-    const parts = ans.split(/[/:]/);
-    if (parts.length === 2) {
-        const a = parseInt(parts[0]), b = parseInt(parts[1]);
-        const sep = ans.includes('/') ? '/' : ':';
-        return [
-            ans,
-            `${b}${sep}${a}`,
-            `${a + 1}${sep}${b}`,
-            `${a}${sep}${b + 1}`
-        ];
-    }
-    return [ans, '1/2', '2/3', '3/4'];
-}
-
-// 生成選項（本地規則）
-function generateOptions(question) {
-    const { subject, answer } = question;
-    const rules = optionRules[subject] || optionRules['數學'];
-    
-    let options = [];
-    
-    // 檢查是否有匹配的模板
-    if (rules.templates) {
-        for (let template of rules.templates) {
-            if (template.pattern.test(answer)) {
-                options = template.generate(answer);
-                break;
-            }
-        }
-    }
-    
-    // 使用預設規則
-    if (options.length === 0) {
-        options = rules.default(answer);
-    }
-    
-    // 確保正確答案在內，並隨機排序
-    if (!options.includes(answer)) options[0] = answer;
-    return options.sort(() => Math.random() - 0.5);
-}
-
-// 圖片處理
-document.getElementById('image').onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-        const image = new Image();
-        image.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            let w = image.width, h = image.height;
-            if (w > 800) { h *= 800 / w; w = 800; }
-            canvas.width = w;
-            canvas.height = h;
-            ctx.drawImage(image, 0, 0, w, h);
-            img = canvas.toDataURL('image/jpeg', 0.6);
-            document.getElementById('preview-img').src = img;
-            document.getElementById('preview-img').style.display = 'block';
+// 圖片
+document.getElementById('img').onchange = e => {
+    const f = e.target.files[0];
+    if(!f) return;
+    const r = new FileReader();
+    r.onload = ev => {
+        const i = new Image();
+        i.onload = () => {
+            const c = document.createElement('canvas'), ctx = c.getContext('2d');
+            let w=i.width, h=i.height;
+            if(w>800){h*=800/w; w=800;}
+            c.width=w; c.height=h;
+            ctx.drawImage(i,0,0,w,h);
+            imgData = c.toDataURL('image/jpeg',0.6);
+            document.getElementById('preview').src = imgData;
+            document.getElementById('preview').style.display = 'block';
         };
-        image.src = ev.target.result;
+        i.src = ev.target.result;
     };
-    reader.readAsDataURL(file);
+    r.readAsDataURL(f);
 };
+
+// 背景生成選項
+async function genOpts(q) {
+    try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 500,
+                messages: [{
+                    role: 'user',
+                    content: `${q.subject}題目：${q.point}\n正確答案：${q.answer}\n\n生成3個錯誤選項（如有注音要用注音）。回傳JSON：{"options":["選項1","選項2","選項3","${q.answer}"]}`
+                }]
+            })
+        });
+        const d = await res.json();
+        let txt = d.content.find(c=>c.type==='text')?.text || '';
+        txt = txt.replace(/```json|```/g,'').trim();
+        const parsed = JSON.parse(txt);
+        return parsed.options.sort(()=>Math.random()-0.5);
+    } catch(e) {
+        console.error(e);
+        return null;
+    }
+}
 
 // 儲存
-function save() {
-    const s = document.getElementById('subject').value;
-    const p = document.getElementById('point').value.trim();
-    const a = document.getElementById('answer').value.trim();
-    const autoGen = document.getElementById('auto-generate').checked;
+async function save() {
+    const s=document.getElementById('subj').value;
+    const p=document.getElementById('point').value.trim();
+    const a=document.getElementById('ans').value.trim();
+    if(!p||!a) return alert('請填寫題目和答案');
     
-    if (!p || !a) return alert('請填寫題目和答案');
+    const q = {id:Date.now(), date:Date.now(), subject:s, point:p, answer:a, image:imgData};
     
-    const newQuestion = {
-        id: Date.now(),
-        date: Date.now(),
-        subject: s,
-        point: p,
-        answer: a,
-        image: img
-    };
-    
-    // 背景預先生成選項
-    if (autoGen) {
-        newQuestion.options = generateOptions(newQuestion);
-    }
-    
-    let data = JSON.parse(localStorage.getItem('mistakes') || '[]');
-    data.push(newQuestion);
-    localStorage.setItem('mistakes', JSON.stringify(data));
+    // 背景預生成
+    genOpts(q).then(opts => {
+        if(opts) q.options = opts;
+        let data = JSON.parse(localStorage.getItem('db')||'[]');
+        data.push(q);
+        localStorage.setItem('db', JSON.stringify(data));
+    });
     
     document.getElementById('point').value = '';
-    document.getElementById('answer').value = '';
-    document.getElementById('image').value = '';
-    document.getElementById('preview-img').style.display = 'none';
-    img = null;
-    alert('已儲存');
+    document.getElementById('ans').value = '';
+    document.getElementById('img').value = '';
+    document.getElementById('preview').style.display = 'none';
+    imgData = null;
+    alert('已儲存（選項生成中）');
 }
 
-// 複習模式
-function filterSubject(el, s) {
-    document.querySelectorAll('#review-view .chip').forEach(c => c.classList.remove('active'));
+// 複習
+function filter(el,s) {
+    document.querySelectorAll('#review .chip').forEach(c=>c.classList.remove('active'));
     el.classList.add('active');
-    reviewSubject = s;
+    rSubj=s;
     renderCards();
 }
 
 function renderCards() {
-    const container = document.getElementById('cards');
-    container.innerHTML = '';
-    
-    let data = JSON.parse(localStorage.getItem('mistakes') || '[]');
-    const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
-    data = data.filter(d => d.date > cutoff);
-    
-    if (reviewSubject !== 'all') data = data.filter(d => d.subject === reviewSubject);
+    const cont = document.getElementById('cards');
+    cont.innerHTML = '';
+    let data = JSON.parse(localStorage.getItem('db')||'[]');
+    const cut = Date.now()-14*24*60*60*1000;
+    data = data.filter(d=>d.date>cut);
+    if(rSubj!=='all') data = data.filter(d=>d.subject===rSubj);
     data.reverse();
-    
-    if (data.length === 0) {
-        container.innerHTML = '<div class="empty">沒有錯題</div>';
-        return;
-    }
-    
-    data.forEach(d => {
+    if(data.length===0){cont.innerHTML='<div class="empty">沒有錯題</div>'; return;}
+    data.forEach(d=>{
         const card = document.createElement('div');
         card.className = 'card';
-        const date = new Date(d.date).toLocaleDateString('zh-TW', {month:'2-digit',day:'2-digit'});
+        const date = new Date(d.date).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'});
         card.innerHTML = `
             <div class="card-header">
                 <span class="subject-tag">${d.subject}</span>
                 <span>${date}</span>
             </div>
-            ${d.image ? `<img src="${d.image}">` : ''}
+            ${d.image?`<img src="${d.image}">`:''}
             <div style="margin-bottom:16px;">${d.point}</div>
-            <button class="btn-secondary" onclick="toggleAns(this)">顯示答案</button>
+            <button class="btn-secondary" onclick="toggleA(this)">顯示答案</button>
             <div class="answer-hidden">答案：${d.answer}</div>
         `;
-        container.appendChild(card);
+        cont.appendChild(card);
     });
 }
 
-function toggleAns(btn) {
-    const ans = btn.nextElementSibling;
-    if (ans.style.display === 'block') {
-        ans.style.display = 'none';
-        btn.textContent = '顯示答案';
-    } else {
-        ans.style.display = 'block';
-        btn.textContent = '隱藏答案';
+function toggleA(btn) {
+    const a = btn.nextElementSibling;
+    if(a.style.display==='block'){
+        a.style.display='none';
+        btn.textContent='顯示答案';
+    }else{
+        a.style.display='block';
+        btn.textContent='隱藏答案';
     }
 }
 
-// 考試模式
-function filterExam(el, s) {
-    document.querySelectorAll('#exam-view .chip').forEach(c => c.classList.remove('active'));
+// 考試
+function filterE(el,s) {
+    document.querySelectorAll('#exam .chip').forEach(c=>c.classList.remove('active'));
     el.classList.add('active');
-    examSubject = s;
-    updateCount();
+    eSubj=s;
+    updateC();
 }
 
-function updateCount() {
-    let data = JSON.parse(localStorage.getItem('mistakes') || '[]');
-    const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
-    data = data.filter(d => d.date > cutoff);
-    if (examSubject !== 'all') data = data.filter(d => d.subject === examSubject);
-    
-    const el = document.getElementById('exam-count');
-    el.textContent = data.length === 0 ? '沒有符合的錯題' : `共 ${data.length} 題`;
+function updateC() {
+    let data = JSON.parse(localStorage.getItem('db')||'[]');
+    const cut = Date.now()-14*24*60*60*1000;
+    data = data.filter(d=>d.date>cut);
+    if(eSubj!=='all') data = data.filter(d=>d.subject===eSubj);
+    document.getElementById('count').textContent = data.length===0?'沒有錯題':`共 ${data.length} 題`;
 }
 
 function startExam() {
-    let data = JSON.parse(localStorage.getItem('mistakes') || '[]');
-    const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
-    data = data.filter(d => d.date > cutoff);
-    if (examSubject !== 'all') data = data.filter(d => d.subject === examSubject);
-    
-    if (data.length === 0) return alert('沒有題目');
-    
-    questions = data.sort(() => Math.random() - 0.5);
-    curr = 0;
-    correct = 0;
-    wrong = 0;
-    
-    document.getElementById('exam-start').classList.add('hidden');
-    document.getElementById('exam-progress').classList.remove('hidden');
-    showQuestion();
+    let data = JSON.parse(localStorage.getItem('db')||'[]');
+    const cut = Date.now()-14*24*60*60*1000;
+    data = data.filter(d=>d.date>cut);
+    if(eSubj!=='all') data = data.filter(d=>d.subject===eSubj);
+    if(data.length===0) return alert('沒有題目');
+    qs = data.sort(()=>Math.random()-0.5);
+    cur=0; cor=0; wrg=0;
+    document.getElementById('start').classList.add('hidden');
+    document.getElementById('prog').classList.remove('hidden');
+    showQ();
 }
 
-function showQuestion() {
-    if (curr >= questions.length) return showResult();
+async function showQ() {
+    if(cur>=qs.length) return showR();
+    const q = qs[cur];
+    document.getElementById('cur').textContent = cur+1;
+    document.getElementById('tot').textContent = qs.length;
+    document.getElementById('cor').textContent = cor;
+    document.getElementById('wrg').textContent = wrg;
+    document.getElementById('qtxt').textContent = q.point;
+    const qimg = document.getElementById('qimg');
+    if(q.image){qimg.src=q.image; qimg.classList.remove('hidden');}
+    else{qimg.classList.add('hidden');}
+    sel=null;
     
-    const q = questions[curr];
-    document.getElementById('curr').textContent = curr + 1;
-    document.getElementById('total').textContent = questions.length;
-    document.getElementById('correct').textContent = correct;
-    document.getElementById('wrong').textContent = wrong;
-    document.getElementById('q-text').textContent = q.point;
-    
-    const qImg = document.getElementById('q-img');
-    if (q.image) {
-        qImg.src = q.image;
-        qImg.classList.remove('hidden');
-    } else {
-        qImg.classList.add('hidden');
-    }
-    
-    selected = null;
-    displayAnswerArea(q);
-}
-
-function displayAnswerArea(q) {
-    const area = document.getElementById('answer-area');
-    
-    // 如果有預先生成的選項，顯示選擇題
-    if (q.options && q.options.length > 0) {
-        const labels = ['A', 'B', 'C', 'D'];
-        area.innerHTML = '<div class="options">' + 
-            q.options.map((opt, i) => 
-                `<div class="option" onclick="selectOption(this, '${opt.replace(/'/g, "\\'")}')">
-                    <span class="option-label">${labels[i]}</span>
-                    <span>${opt}</span>
+    const opts = document.getElementById('opts');
+    if(q.options){
+        const lbl = ['A','B','C','D'];
+        opts.innerHTML = q.options.map((o,i)=>
+            `<div class="option" onclick="selectO(this,'${o.replace(/'/g,"\\'")}')">
+                <span class="option-label">${lbl[i]}</span><span>${o}</span>
+            </div>`
+        ).join('');
+    }else{
+        opts.innerHTML = '<div class="loading">生成選項中...</div>';
+        const newOpts = await genOpts(q);
+        if(newOpts){
+            q.options = newOpts;
+            let data = JSON.parse(localStorage.getItem('db')||'[]');
+            const idx = data.findIndex(d=>d.id===q.id);
+            if(idx!==-1) data[idx] = q;
+            localStorage.setItem('db',JSON.stringify(data));
+            const lbl = ['A','B','C','D'];
+            opts.innerHTML = newOpts.map((o,i)=>
+                `<div class="option" onclick="selectO(this,'${o.replace(/'/g,"\\'")}')">
+                    <span class="option-label">${lbl[i]}</span><span>${o}</span>
                 </div>`
-            ).join('') + 
-        '</div>';
-    } else {
-        // 沒有選項就用填空題
-        area.innerHTML = '<input type="text" class="answer-input" id="user-input" placeholder="輸入答案...">';
+            ).join('');
+        }else{
+            opts.innerHTML = '<div class="loading">生成失敗</div>';
+        }
     }
 }
 
-function selectOption(el, opt) {
-    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+function selectO(el,opt) {
+    document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
     el.classList.add('selected');
-    selected = opt;
+    sel=opt;
 }
 
 function submit() {
-    const q = questions[curr];
-    
-    // 判斷答案
-    if (!selected) {
-        const input = document.getElementById('user-input');
-        if (input) selected = input.value.trim();
-    }
-    
-    if (!selected) return alert('請選擇或輸入答案');
-    
-    const isCorrect = selected.toLowerCase().replace(/\s/g, '') === 
-                     q.answer.toLowerCase().replace(/\s/g, '');
-    
-    // 如果是選擇題，標記正確答案
-    if (q.options) {
-        document.querySelectorAll('.option').forEach(o => {
-            const text = o.querySelector('span:last-child').textContent;
-            if (text.trim().toLowerCase() === q.answer.trim().toLowerCase()) {
-                o.classList.add('correct');
-            } else if (o.classList.contains('selected')) {
-                o.classList.add('wrong');
-            }
-            o.onclick = null;
-        });
-    }
-    
-    if (isCorrect) correct++;
-    else wrong++;
-    
-    setTimeout(() => {
-        curr++;
-        showQuestion();
-    }, 1500);
+    if(!sel) return alert('請選擇答案');
+    const q = qs[cur];
+    const ok = sel.trim().toLowerCase()===q.answer.trim().toLowerCase();
+    document.querySelectorAll('.option').forEach(o=>{
+        const t = o.querySelector('span:last-child').textContent;
+        if(t.trim().toLowerCase()===q.answer.trim().toLowerCase()) o.classList.add('correct');
+        else if(o.classList.contains('selected')) o.classList.add('wrong');
+        o.onclick=null;
+    });
+    if(ok) cor++; else wrg++;
+    setTimeout(()=>{cur++; showQ();}, 1500);
 }
 
 function skip() {
-    wrong++;
-    curr++;
-    showQuestion();
+    wrg++; cur++; showQ();
 }
 
-function showResult() {
-    const total = questions.length;
-    const pct = Math.round((correct / total) * 100);
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'result-overlay';
-    overlay.innerHTML = `
+function showR() {
+    const tot=qs.length, pct=Math.round((cor/tot)*100);
+    const ov = document.createElement('div');
+    ov.className = 'result-overlay';
+    ov.innerHTML = `
         <div class="result-box">
-            <h2>測驗完成</h2>
+            <h2>完成</h2>
             <div class="result-score">${pct}%</div>
             <div class="result-stats">
-                <div class="result-stat">
-                    <div class="stat-value" style="color:#4caf50;">${correct}</div>
-                    <div class="stat-label">答對</div>
-                </div>
-                <div class="result-stat">
-                    <div class="stat-value" style="color:#f44336;">${wrong}</div>
-                    <div class="stat-label">答錯</div>
-                </div>
-                <div class="result-stat">
-                    <div class="stat-value">${total}</div>
-                    <div class="stat-label">總題數</div>
-                </div>
+                <div><div class="stat-value" style="color:#4caf50;">${cor}</div><div class="stat-label">答對</div></div>
+                <div><div class="stat-value" style="color:#f44336;">${wrg}</div><div class="stat-label">答錯</div></div>
+                <div><div class="stat-value">${tot}</div><div class="stat-label">總數</div></div>
             </div>
-            <button class="btn-primary" onclick="closeExam()">完成</button>
+            <button class="btn-primary" onclick="closeE()">完成</button>
         </div>
     `;
-    document.body.appendChild(overlay);
+    document.body.appendChild(ov);
 }
 
-function closeExam() {
+function closeE() {
     document.querySelector('.result-overlay')?.remove();
-    document.getElementById('exam-start').classList.remove('hidden');
-    document.getElementById('exam-progress').classList.add('hidden');
+    document.getElementById('start').classList.remove('hidden');
+    document.getElementById('prog').classList.add('hidden');
 }
 
-// 視圖切換
-function switchView(id, el) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+function switchView(id,el) {
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     el.classList.add('active');
-    
-    if (id === 'review-view') renderCards();
-    if (id === 'exam-view') {
-        document.getElementById('exam-start').classList.remove('hidden');
-        document.getElementById('exam-progress').classList.add('hidden');
-        updateCount();
+    if(id==='review') renderCards();
+    if(id==='exam'){
+        document.getElementById('start').classList.remove('hidden');
+        document.getElementById('prog').classList.add('hidden');
+        updateC();
     }
 }
 
-window.onload = updateCount;
+window.onload = updateC;
 </script>
-
 </body>
 </html>
